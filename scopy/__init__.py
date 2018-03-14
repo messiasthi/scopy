@@ -2,15 +2,11 @@
 import os
 import sys
 
-def main():
-	scp(sys.argv)
-
 params = [
 	'from',
 	'to',
 	'keywords',
 	'newwords',
-	'regex',
 	'uppercase',
 	'lowercase',
 	'bothcase'
@@ -22,13 +18,14 @@ def help():
 	print("version: 1.0")
 	print("bug report/issues on https://github.com/messiasthi/scopy")
 	print("Usage:")
-	print("\tscopy from=\"/path/to/template.file\" to=\"/path/to/new.file\" keyword=\"example1\" replace=\"replace\"")
+	print("\tscopy from=\"/path/to/template.file\" to=\"/path/to/new.file\" keywords=\"example1\" replaces=\"replace\"")
 	print("\t\tfrom\tThe original file")
 	print("\t\tto\tThe new file")
 	print("\t\tkeywords\tWords to replace for a new word")
 	print("\t\tnewwords\tNew words")
+	exit(0)
 
-def replace(line):
+def replace(line, words, replaces):
 	newLine = line
 	for word in words:
 		if word.lower() in newLine:
@@ -40,15 +37,13 @@ def replace(line):
 	return newLine
 
 def scp(paramsFromCommandline):
-	originalFile=""
-	newFile=""
-	words=""
-	replaces=""
+	verbose = False
+	if len(paramsFromCommandline) == 1:
+		help()
 
 	for value in paramsFromCommandline:
 		if "--help" in value or "-help" in value or "help" in value:
 			help()
-			exit(0)
 		elif "from=" in value:
 			originalFile = value.replace("from=", "")
 		elif "to=" in value:
@@ -57,6 +52,11 @@ def scp(paramsFromCommandline):
 			words = value.replace("keywords=", "").split()
 		elif "replaces=" in value:
 			replaces = value.replace("replaces=", "").split()
+		elif "verbose" in value:
+			verbose = True
+
+	if verbose:
+		print(paramsFromCommandline)
 
 	if len(words) != len(replaces):
 		print("Error: The number of words and replaces must be equals")
@@ -66,13 +66,19 @@ def scp(paramsFromCommandline):
 		if not os.path.isfile(newFile):
 			with open(originalFile, "r") as of, open(newFile, "w") as nf:
 				for line in of:
-					newLine = replace(line)
+					newLine = replace(line, words, replaces)
+					if verbose:
+						print(line, " => ", newLine)
 					nf.write(newLine)
 
-
+			exit(0)
 		else:
 			print("Error: The new file already exists")
 			exit(1)
 	else:
 		help()
 		exit(0)
+	exit(1)
+
+def main():
+	scp(sys.argv)
