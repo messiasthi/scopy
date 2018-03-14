@@ -1,7 +1,9 @@
 #! /usr/bin/env python
-import sys
 import os
-import re
+import sys
+
+def main():
+	scp(sys.argv)
 
 params = [
 	'from',
@@ -37,41 +39,40 @@ def replace(line):
 			newLine = newLine.replace(word.title(), replaces[words.index(word)].title())
 	return newLine
 
+def scp(paramsFromCommandline):
+	originalFile=""
+	newFile=""
+	words=""
+	replaces=""
+
+	for value in paramsFromCommandline:
+		if "--help" in value or "-help" in value or "help" in value:
+			help()
+			exit(0)
+		elif "from=" in value:
+			originalFile = value.replace("from=", "")
+		elif "to=" in value:
+			newFile = value.replace("to=", "")
+		elif "keywords=" in value:
+			words = value.replace("keywords=", "").split()
+		elif "replaces=" in value:
+			replaces = value.replace("replaces=", "").split()
+
+	if len(words) != len(replaces):
+		print("Error: The number of words and replaces must be equals")
+		exit(1)
+
+	if os.path.isfile(originalFile):
+		if not os.path.isfile(newFile):
+			with open(originalFile, "r") as of, open(newFile, "w") as nf:
+				for line in of:
+					newLine = replace(line)
+					nf.write(newLine)
 
 
-originalFile=""
-newFile=""
-words=""
-replaces=""
-
-for value in sys.argv:
-	if "--help" in value or "-help" in value or "help" in value:
+		else:
+			print("Error: The new file already exists")
+			exit(1)
+	else:
 		help()
 		exit(0)
-	elif "from=" in value:
-		originalFile = value.replace("from=", "")
-	elif "to=" in value:
-		newFile = value.replace("to=", "")
-	elif "keywords=" in value:
-		words = value.replace("keywords=", "").split()
-	elif "replaces=" in value:
-		replaces = value.replace("replaces=", "").split()
-
-if len(words) != len(replaces):
-	print("Error: The number of words and replaces must be equals")
-	exit(1)
-
-if os.path.isfile(originalFile):
-	if not os.path.isfile(newFile):
-		with open(originalFile, "r") as of, open(newFile, "w") as nf:
-			for line in of:
-				newLine = replace(line)
-				nf.write(newLine)
-
-
-	else:
-		print("Error: The new file already exists")
-		exit(1)
-else:
-	print("Error: The original file not found")
-	exit(1)
