@@ -2,58 +2,70 @@
 import os
 import sys
 
-params = [
-	'from',
-	'to',
-	'keywords',
-	'newwords',
-	'uppercase',
-	'lowercase',
-	'bothcase'
-]
-
 def help():
 	print("The scopy is a alias to copy paste files")
 	print("with one difference, find and replace words or expressions.")
-	print("version: 1.0")
+	print("version: 1.1")
 	print("bug report/issues on https://github.com/messiasthi/scopy")
 	print("Usage:")
-	print("\tscopy from=\"/path/to/template.file\" to=\"/path/to/new.file\" keywords=\"example1\" replaces=\"replace\"")
+	print("\tscopy from=\"/path/to/template.file\" keywords=\"example1\" replaces=\"replace\"")
 	print("\t\tfrom\tThe original file")
-	print("\t\tto\tThe new file")
 	print("\t\tkeywords\tWords to replace for a new word")
 	print("\t\tnewwords\tNew words")
+	print("\t\t\tuppercase|lowercase|titlecase|allcases[default]\tReplace only specific cases, all cases is default, but you can pass one or more.")
 	exit(0)
 
-def replace(line, words, replaces):
-	newLine = line
-	for word in words:
-		if word.lower() in newLine:
-			newLine = newLine.replace(word, replaces[words.index(word)].lower())
-		if word.upper() in newLine:
-			newLine = newLine.replace(word.upper(), replaces[words.index(word)].upper())
-		if word.title() in newLine:
-			newLine = newLine.replace(word.title(), replaces[words.index(word)].title())
-	return newLine
+def replace(line, words, replaces, lower, upper, title):
+	wordsInLine = line.split()
+	newWords = []
+	for word in wordsInLine:
+		if word.lower() in words and lower:
+			newWords.append(replaces[words.index(word.lower())].lower())
+		elif word.upper() in words and upper:
+			newWords.append(replaces[words.index(word.upper())].upper())
+		elif word.title() in words and title:
+			newWords.append(replaces[words.index(word.title())].title())
+		else:
+			newWords.append(word)
+	return " ".join(newWords)
 
 def scp(paramsFromCommandline):
 	verbose = False
 	if len(paramsFromCommandline) == 1:
 		help()
 
+	allcases = True
+	titlecase = False
+	lowercase = False
+	uppercase = False
+
 	for value in paramsFromCommandline:
 		if "--help" in value or "-help" in value or "help" in value:
 			help()
 		elif "from=" in value:
 			originalFile = value.replace("from=", "")
-		elif "to=" in value:
-			newFile = value.replace("to=", "")
 		elif "keywords=" in value:
 			words = value.replace("keywords=", "").split()
 		elif "replaces=" in value:
 			replaces = value.replace("replaces=", "").split()
 		elif "verbose" in value:
 			verbose = True
+		elif "uppercase" in value:
+			uppercase = True
+			allcases = False
+		elif "lowercase" in value:
+			lowercase = True
+			allcases = False
+		elif "titlecase" in value:
+			titlecase = True
+			allcases = False
+		elif "allcases" in value:
+			allcases = True
+
+	if allcases:
+		titlecase = True
+		lowercase = True
+		uppercase = True
 
 	if verbose:
 		print(paramsFromCommandline)
@@ -63,18 +75,14 @@ def scp(paramsFromCommandline):
 		exit(1)
 
 	if os.path.isfile(originalFile):
-		if not os.path.isfile(newFile):
-			with open(originalFile, "r") as of, open(newFile, "w") as nf:
-				for line in of:
-					newLine = replace(line, words, replaces)
-					if verbose:
-						print(line, " => ", newLine)
-					nf.write(newLine)
+		with open(originalFile, "r") as of:
+			for line in of:
+				newLine = replace(line, words, replaces, lowercase, uppercase, titlecase)
+				if verbose:
+					print(line, " => ", newLine)
+				print(newLine)
 
-			exit(0)
-		else:
-			print("Error: The new file already exists")
-			exit(1)
+		exit(0)
 	else:
 		help()
 		exit(0)
