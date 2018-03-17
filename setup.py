@@ -3,8 +3,8 @@ from setuptools import setup, find_packages
 
 setup(
 	name="Super Copy Paste",
-	version="1.0",
-	description='A sample Python project',  # Required
+	version="1.1",
+	description='Little tool for copy files and replaces selected words for newers',
 	url='https://github.com/messiasthi/scopy',
 	author='Thiago Messias',
 	author_email='messiasthi@gmail.com',
