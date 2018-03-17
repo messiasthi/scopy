@@ -1,9 +1,9 @@
-# scopy
+# SCOPY or Super Copy And Paste
 ### Super copy paste
 Scopy it's a  tool for copy full file and replace selected words to newers.
 
 ## Help
-The scopy it's a tool for helpful in copy big files and replace words using python. 
+The scopy it's a tool for helpful in copy big files and replace words using python.
 
 ```
 The scopy is a alias to copy paste files
