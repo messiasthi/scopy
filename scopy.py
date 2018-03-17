@@ -12,22 +12,25 @@ def help():
 	print("\t\tfrom\tThe original file")
 	print("\t\tkeywords\tWords to replace for a new word")
 	print("\t\tnewwords\tNew words")
-	print("\t\t\tuppercase|lowercase|titlecase|allcases[default]\tReplace only specific cases, all cases is default, but you can pass one or more.")
+	print("\t\tuppercase|lowercase|titlecase|allcases[default]\tReplace only specific cases, all cases is default, but you can pass one or more.")
 	exit(0)
 
 def replace(line, words, replaces, lower, upper, title):
 	wordsInLine = line.split()
-	newWords = []
+	newLine = []
 	for word in wordsInLine:
-		if word.lower() in words and lower:
-			newWords.append(replaces[words.index(word.lower())].lower())
-		elif word.upper() in words and upper:
-			newWords.append(replaces[words.index(word.upper())].upper())
-		elif word.title() in words and title:
-			newWords.append(replaces[words.index(word.title())].title())
+		if title and word.istitle() and word.lower() in words:
+			# print("case: title -> " + word + " -> " + replaces[ words.index( word.lower() ) ].title())
+			newLine.append( replaces[ words.index( word.lower() ) ].title() )
+		elif lower and word.islower() and word.lower() in words:
+			# print("case: lower -> " + word + " -> " + replaces[ words.index( word.lower() ) ].lower())
+			newLine.append( replaces[ words.index( word.lower() ) ].lower() )
+		elif upper and word.isupper() and word.lower() in words:
+			# print("case: upper -> " + word + " -> " + replaces[ words.index( word.lower() ) ].upper())
+			newLine.append( replaces[ words.index( word.lower() ) ].upper() )
 		else:
-			newWords.append(word)
-	return " ".join(newWords)
+			newLine.append(word)
+	return " ".join(newLine)
 
 def scp(paramsFromCommandline):
 	verbose = False
@@ -45,9 +48,9 @@ def scp(paramsFromCommandline):
 		elif "from=" in value:
 			originalFile = value.replace("from=", "")
 		elif "keywords=" in value:
-			words = value.replace("keywords=", "").split()
+			words = value.replace("keywords=", "").lower().split()
 		elif "replaces=" in value:
-			replaces = value.replace("replaces=", "").split()
+			replaces = value.replace("replaces=", "").lower().split()
 		elif "verbose" in value:
 			verbose = True
 		elif "uppercase" in value:
