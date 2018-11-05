@@ -2,51 +2,53 @@
 import os
 import sys
 
+
 def help():
-	print("The scopy is a alias to copy paste files")
-	print("with one difference, find and replace words or expressions.")
-	print("version: 1.1")
-	print("bug report/issues on https://github.com/messiasthi/scopy")
-	print("Usage:")
-	print("\tscopy from=\"/path/to/template.file\" keywords=\"example1\" replaces=\"replace\"")
-	print("\t\tfrom\tThe original file")
-	print("\t\tkeywords\tWords to replace for a new word")
-	print("\t\tnewwords\tNew words")
-	print("\t\tuppercase|lowercase|titlecase|allcases[default]\tReplace only specific cases, all cases is default, but you can pass one or more.")
+	print("""The scopy is a alias to copy paste files with one difference, find and replace words or expressions. 
+	bug report/issues on https://github.com/messiasthi/scopy
+	version: 1.1
+	Usage:
+	\tscopy from=\"/path/to/template.file\" keywords=\"example1\" replaces=\"replace\"
+	\t\tfrom\t\tThe original file
+	\t\tkeywords\tWords to replace for a new word
+	\t\tnewwords\tNew words
+	\t\tuppercase|lowercase|title_cases|all_cases[default]\tReplace only specific cases, all cases is default, but you can pass one or more.""")
 	exit(0)
 
+
 def replace(line, words, replaces, lower, upper, title):
-	wordsInLine = line.split()
-	newLine = []
-	for word in wordsInLine:
+	words_in_line = line.split()
+	new_line = []
+	for word in words_in_line:
 		if title and word.istitle() and word.lower() in words:
 			# print("case: title -> " + word + " -> " + replaces[ words.index( word.lower() ) ].title())
-			newLine.append( replaces[ words.index( word.lower() ) ].title() )
+			new_line.append( replaces[ words.index( word.lower() ) ].title() )
 		elif lower and word.islower() and word.lower() in words:
 			# print("case: lower -> " + word + " -> " + replaces[ words.index( word.lower() ) ].lower())
-			newLine.append( replaces[ words.index( word.lower() ) ].lower() )
+			new_line.append( replaces[ words.index( word.lower() ) ].lower() )
 		elif upper and word.isupper() and word.lower() in words:
 			# print("case: upper -> " + word + " -> " + replaces[ words.index( word.lower() ) ].upper())
-			newLine.append( replaces[ words.index( word.lower() ) ].upper() )
+			new_line.append( replaces[ words.index( word.lower() ) ].upper() )
 		else:
-			newLine.append(word)
-	return " ".join(newLine)
+			new_line.append(word)
+	return " ".join(new_line)
 
-def scp(paramsFromCommandline):
+
+def scp(params_from_cmdline):
 	verbose = False
-	if len(paramsFromCommandline) == 1:
+	if len(params_from_cmdline) == 1:
 		help()
 
-	allcases = True
-	titlecase = False
+	all_cases = True
+	title_cases = False
 	lowercase = False
 	uppercase = False
 
-	for value in paramsFromCommandline:
+	for value in params_from_cmdline:
 		if "--help" in value or "-help" in value or "help" in value:
 			help()
 		elif "from=" in value:
-			originalFile = value.replace("from=", "")
+			original_file = value.replace("from=", "")
 		elif "keywords=" in value:
 			words = value.replace("keywords=", "").lower().split()
 		elif "replaces=" in value:
@@ -55,41 +57,42 @@ def scp(paramsFromCommandline):
 			verbose = True
 		elif "uppercase" in value:
 			uppercase = True
-			allcases = False
+			all_cases = False
 		elif "lowercase" in value:
 			lowercase = True
-			allcases = False
-		elif "titlecase" in value:
-			titlecase = True
-			allcases = False
-		elif "allcases" in value:
-			allcases = True
+			all_cases = False
+		elif "title_cases" in value:
+			title_cases = True
+			all_cases = False
+		elif "all_cases" in value:
+			all_cases = True
 
-	if allcases:
-		titlecase = True
+	if all_cases:
+		title_cases = True
 		lowercase = True
 		uppercase = True
 
 	if verbose:
-		print(paramsFromCommandline)
+		print(params_from_cmdline)
 
 	if len(words) != len(replaces):
 		print("Error: The number of words and replaces must be equals")
 		exit(1)
 
-	if os.path.isfile(originalFile):
-		with open(originalFile, "r") as of:
+	if os.path.isfile(original_file):
+		with open(original_file, "r") as of:
 			for line in of:
-				newLine = replace(line, words, replaces, lowercase, uppercase, titlecase)
+				new_line = replace(line, words, replaces, lowercase, uppercase, title_cases)
 				if verbose:
-					print(line, " => ", newLine)
-				print(newLine)
+					print(line, " => ", new_line)
+				print(new_line)
 
 		exit(0)
 	else:
 		help()
 		exit(0)
 	exit(1)
+
 
 def main():
 	scp(sys.argv)
