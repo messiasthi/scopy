@@ -1,6 +1,12 @@
 # SCOPY or Super Copy And Paste
+
 ### Super copy paste
 Scopy it's a  tool for copy full file and replace selected words to newers.
+
+## Install
+To install from source code use `python setup.py install`.
+
+Install by `pip` in comming soon.
 
 ## Help
 The scopy it's a tool for helpful in copy big files and replace words using python.
@@ -19,4 +25,4 @@ Usage:
 ```
 ## Contributions and bug report
 
-All Pull Requests and Issues is welcome! I be happy with any contribution.
+All Pull Requests is appreciated! I be happy with any contribution.
